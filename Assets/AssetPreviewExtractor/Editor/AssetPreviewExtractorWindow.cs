@@ -8,9 +8,11 @@ namespace NikitaKirakosyan.AssetPreviewExtractor
     {
         public GameObject[] assets;
         public string savePath = "Assets/PrefabPreviews";
+        public bool extraSettings;
+        public TextureSettings textureSettings;
 
         private Vector2 _scrollPosition;
-
+        
 
         [MenuItem("Window/AssetPreviewExtractor/Asset Preview Extractor Window", priority = 0)]
         public static void ShowWindow()
@@ -28,13 +30,27 @@ namespace NikitaKirakosyan.AssetPreviewExtractor
         {
             var serializedObj = new SerializedObject(this);
             var assetsProp = serializedObj.FindProperty(nameof(assets));
+            var textureSettingsProp = serializedObj.FindProperty(nameof(textureSettings));
 
             //Vertical Start
             GUILayout.BeginVertical();
+            
             savePath = EditorGUILayout.TextField("Save Path", savePath);
-
+            
             //Scroll Start
             _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
+            
+            extraSettings = EditorGUILayout.Toggle("Extra Settings", extraSettings);
+            if(extraSettings)
+            {
+                EditorGUILayout.PropertyField(textureSettingsProp, true);
+                GUILayout.Space(15);
+            }
+            else
+            {
+                textureSettings = null;
+            }
+            
             EditorGUILayout.PropertyField(assetsProp, true);
             GUILayout.EndScrollView();
             //Scroll End
@@ -42,7 +58,7 @@ namespace NikitaKirakosyan.AssetPreviewExtractor
             if(GUILayout.Button("Generate previews", options: new[] { GUILayout.Height(32) }))
             {
                 foreach(var asset in assets)
-                    AssetPreviewExtractor.ExtractAndSavePreview(savePath, asset);
+                    AssetPreviewExtractor.ExtractAndSavePreview(savePath, asset, textureSettings);
             }
             
             var folderToPing = AssetDatabase.LoadAssetAtPath<Object>($"{savePath}");
