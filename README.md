@@ -8,6 +8,7 @@
 - **Supported assets**: Works with prefabs.
 - **Customizable Settings**: Offers optional settings to tailor the preview generation process.
 - **Quick Folder Access**: Provides an option to quickly locate the folder containing the generated previews.
+- **Transparent background**: Make the gray background (by default) transparent by TextureSettings.alphaIsTransparency = true.
 
 ## Installation
 
