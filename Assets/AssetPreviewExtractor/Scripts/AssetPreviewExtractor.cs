@@ -9,6 +9,8 @@ namespace NikitaKirakosyan.AssetPreviewExtractor
     public static class AssetPreviewExtractor
     {
         private const string LogChannel = nameof(AssetPreviewExtractor);
+        
+        private static readonly Color GreyColor = new (0.3215686f, 0.3215686f, 0.3215686f, 1f);
 
 
         public static void ExtractAndSavePreview(string savePath, GameObject asset, TextureSettings textureSettings)
@@ -24,7 +26,22 @@ namespace NikitaKirakosyan.AssetPreviewExtractor
             }
 
             var newTexture = new Texture2D(previewTexture.width, previewTexture.height, TextureFormat.RGBA32, false);
-            newTexture.SetPixels(previewTexture.GetPixels());
+            
+            var pixels = previewTexture.GetPixels();
+            if(textureSettings is { alphaIsTransparency: true })
+            {
+                for(var i = 0; i < pixels.Length; i++)
+                {
+                    var pixel = pixels[i];
+                    if(Mathf.Approximately(pixel.r, GreyColor.r) && Mathf.Approximately(pixel.g, GreyColor.g) && Mathf.Approximately(pixel.b, GreyColor.b) && Mathf.Approximately(pixel.a, GreyColor.a))
+                    {
+                        pixel = Color.clear;
+                        pixels[i] = pixel;
+                    }
+                }
+            }
+            
+            newTexture.SetPixels(pixels);
             newTexture.Apply();
 
             var pngData = newTexture.EncodeToPNG();
